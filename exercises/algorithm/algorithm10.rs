@@ -29,7 +29,11 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        // 调用 trait 中的方法添加从 edge.0 到 edge.1 的边
+        <Self as Graph>::add_edge(self, edge);
+        
+        // 由于是无向图，还需要添加从 edge.1 到 edge.0 的边
+        <Self as Graph>::add_edge(self, (edge.1, edge.0, edge.2));
     }
 }
 pub trait Graph {
@@ -37,11 +41,21 @@ pub trait Graph {
     fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
+        if self.contains(node) {
+            return false;
+        }
+        self.adjacency_table_mutable().insert(node.to_string(), Vec::new());
+        true
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        // 确保两个节点都存在于图中
+        self.add_node(edge.0);
+        self.add_node(edge.1);
+        
+        // 添加边到邻接表
+        if let Some(edges) = self.adjacency_table_mutable().get_mut(edge.0) {
+            edges.push((edge.1.to_string(), edge.2));
+        }
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()

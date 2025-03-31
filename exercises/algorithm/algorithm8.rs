@@ -54,28 +54,41 @@ impl<T> Default for Queue<T> {
 
 pub struct myStack<T>
 {
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+	q1: Queue<T>,  // 主队列，用于存储元素
+	q2: Queue<T>   // 辅助队列，用于重新排列元素
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
 			q1:Queue::<T>::new(),
 			q2:Queue::<T>::new()
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
+        // 将新元素放入辅助队列
+        self.q2.enqueue(elem);
+        
+        // 将主队列中的所有元素移到辅助队列
+        while !self.q1.is_empty() {
+            if let Ok(val) = self.q1.dequeue() {
+                self.q2.enqueue(val);
+            }
+        }
+        
+        // 交换两个队列，使辅助队列成为主队列
+        std::mem::swap(&mut self.q1, &mut self.q2);
     }
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+        // 直接从主队列出队，实现栈的弹出操作
+        if !self.q1.is_empty() {
+            Ok(self.q1.dequeue()?)
+        } else {
+            Err("Stack is empty")
+        }
+        
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.q1.is_empty()
     }
 }
 

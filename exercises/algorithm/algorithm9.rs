@@ -37,7 +37,24 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 添加元素到堆的末尾
+        self.items.push(value);
+        self.count += 1;
+        
+        // 向上调整堆（上浮）
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+            
+            // 如果当前节点满足堆的比较条件，则停止上浮
+            if !(self.comparator)(&self.items[idx], &self.items[parent]) {
+                break;
+            }
+            
+            // 交换当前节点与父节点
+            self.items.swap(idx, parent);
+            idx = parent;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +74,28 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        // 获取左子节点索引
+        let left = self.left_child_idx(idx);
+        
+        // 如果左子节点超出范围，返回0（表示没有子节点）
+        if left > self.count {
+            return 0;
+        }
+        
+        // 获取右子节点索引
+        let right = self.right_child_idx(idx);
+        
+        // 如果右子节点超出范围，返回左子节点索引
+        if right > self.count {
+            return left;
+        }
+        
+        // 根据比较器比较左右子节点，返回满足条件的子节点索引
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
     }
 }
 
@@ -84,8 +121,39 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        // 如果堆为空，返回None
+        if self.is_empty() {
+            return None;
+        }
+        
+        // 保存堆顶元素
+        let result = std::mem::replace(&mut self.items[1], T::default());
+        
+        // 将最后一个元素移到堆顶
+        if self.count > 1 {
+            self.items[1] = self.items.pop().unwrap();
+        } else {
+            self.items.pop();
+        }
+        
+        self.count -= 1;
+        
+        // 向下调整堆（下沉）
+        let mut current = 1;
+        while self.children_present(current) {
+            let smallest_child = self.smallest_child_idx(current);
+            
+            // 如果当前节点满足堆的比较条件，则停止下沉
+            if (self.comparator)(&self.items[current], &self.items[smallest_child]) {
+                break;
+            }
+            
+            // 交换当前节点与最小（或最大）子节点
+            self.items.swap(current, smallest_child);
+            current = smallest_child;
+        }
+        
+        Some(result)
     }
 }
 
