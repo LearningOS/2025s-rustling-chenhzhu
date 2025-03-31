@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -70,13 +69,45 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
+    where
+        T: Ord,
+    {
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
+		let mut result = LinkedList::new();
+		let mut a_ptr = list_a.start;
+		let mut b_ptr = list_b.start;
+
+		// 当两个链表都有元素时，比较并添加较小的元素
+		while a_ptr.is_some() && b_ptr.is_some() {
+			let a_val = unsafe { &(*a_ptr.unwrap().as_ptr()).val };
+			let b_val = unsafe { &(*b_ptr.unwrap().as_ptr()).val };
+			
+			if a_val <= b_val {
+				// 添加a的当前节点值
+				result.add(unsafe { std::ptr::read(&(*a_ptr.unwrap().as_ptr()).val) });
+				// 移动a的指针
+				a_ptr = unsafe { (*a_ptr.unwrap().as_ptr()).next };
+			} else {
+				// 添加b的当前节点值
+				result.add(unsafe { std::ptr::read(&(*b_ptr.unwrap().as_ptr()).val) });
+				// 移动b的指针
+				b_ptr = unsafe { (*b_ptr.unwrap().as_ptr()).next };
+			}
+		}
+		
+		// 处理剩余的a链表元素
+		while a_ptr.is_some() {
+			result.add(unsafe { std::ptr::read(&(*a_ptr.unwrap().as_ptr()).val) });
+			a_ptr = unsafe { (*a_ptr.unwrap().as_ptr()).next };
+		}
+		
+		// 处理剩余的b链表元素
+		while b_ptr.is_some() {
+			result.add(unsafe { std::ptr::read(&(*b_ptr.unwrap().as_ptr()).val) });
+			b_ptr = unsafe { (*b_ptr.unwrap().as_ptr()).next };
+		}
+		
+		result
 	}
 }
 
