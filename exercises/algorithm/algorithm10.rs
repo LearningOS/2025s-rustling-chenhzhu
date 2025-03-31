@@ -29,11 +29,19 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        // 调用 trait 中的方法添加从 edge.0 到 edge.1 的边
-        <Self as Graph>::add_edge(self, edge);
+        // 确保两个节点都存在于图中
+        self.add_node(edge.0);
+        self.add_node(edge.1);
         
-        // 由于是无向图，还需要添加从 edge.1 到 edge.0 的边
-        <Self as Graph>::add_edge(self, (edge.1, edge.0, edge.2));
+        // 添加从 edge.0 到 edge.1 的边
+        if let Some(edges) = self.adjacency_table_mutable().get_mut(edge.0) {
+            edges.push((edge.1.to_string(), edge.2));
+        }
+        
+        // 添加从 edge.1 到 edge.0 的边
+        if let Some(edges) = self.adjacency_table_mutable().get_mut(edge.1) {
+            edges.push((edge.0.to_string(), edge.2));
+        }
     }
 }
 pub trait Graph {

@@ -43,7 +43,27 @@ impl Default for Person {
 //
 
 impl From<&str> for Person {
-    fn from(s: &str) -> Person {
+    fn from(s: &str) -> Self {
+        if s.is_empty() {
+            return Person::default();
+        }
+        else {
+            let s_split: Vec<&str> = s.split(',').collect();
+        
+            if s_split.len() != 2 {
+                return Person::default();
+            }
+        
+            let name = s_split[0].to_string();
+            if name.is_empty() {
+                return Person::default();
+            }
+        
+            match s_split[1].parse::<usize>() {
+                Ok(age) => Person {name, age},
+                Err(_) => Person::default(),
+            }
+        }
     }
 }
 

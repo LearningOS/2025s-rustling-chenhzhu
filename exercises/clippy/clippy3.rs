@@ -4,8 +4,7 @@
 //
 // Execute `rustlings hint clippy3` or use the `hint` watch subcommand for a hint.
 
-//
-
+#[rustfmt::skip]
 #[allow(unused_variables, unused_assignments)]
 fn main() {
     let my_option: Option<()> = None;
@@ -15,7 +14,7 @@ fn main() {
 
     let my_arr = &[
         -1, -2, -3,
-        -4, -5, -6
+        -4, -5, -6,
     ];
     println!("My array! Here it is: {:?}", my_arr);
 
